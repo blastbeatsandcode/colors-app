@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Colors App</string>
+    <string name="randomize_color">Tap To Change Color</string>
+    <string name="color_value">Color Value</string>
+    <string name="title_activity_drawing">Draw</string>
+    <string name="draw">Draw</string>
+    <string name="enter_text">Enter Text</string>
+    <string name="clear">Clear</string>
+    <string name="save">Save</string>
+</resources>
