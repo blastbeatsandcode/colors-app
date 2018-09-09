@@ -15,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
@@ -22,14 +23,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /* Custom view for drawing on screen */
 public class DrawingCanvasView extends View {
     private Path drawPath;
-    private Paint drawPaint, canvasPaint;;
+    private Paint drawPaint, canvasPaint;
     private Canvas drawCanvas;
     private Bitmap canvasBitmap;
+
+    private List<Button> buttons;
 
 
 
@@ -46,6 +51,8 @@ public class DrawingCanvasView extends View {
         drawPath = new Path();
         drawPaint = new Paint();
 
+        buttons = new ArrayList<Button>();
+
         // Set up initial paint settings
         drawPaint.setColor(Color.BLACK);
         drawPaint.setAntiAlias(true);
@@ -55,6 +62,12 @@ public class DrawingCanvasView extends View {
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
 
         canvasPaint = new Paint(Paint.DITHER_FLAG);
+    }
+
+    /* Adds a button to the button list to be grayed out when drawing */
+    public void AddButton(Button button)
+    {
+        buttons.add(button);
     }
 
     @Override
@@ -80,11 +93,21 @@ public class DrawingCanvasView extends View {
 
         if(event.getAction() == MotionEvent.ACTION_DOWN){
             drawPath.moveTo(x, y);
+
+            // Make buttons transparent while drawing
+            for (Button button: buttons) {
+                button.setAlpha(0.25f);
+            }
         }else if(event.getAction() == MotionEvent.ACTION_MOVE){
             drawPath.lineTo(x, y);
         }else if(event.getAction() == MotionEvent.ACTION_UP){
             drawCanvas.drawPath(drawPath, drawPaint);
             drawPath.reset();
+
+            // When user is done drawing, return buttons to full alpha state
+            for (Button button: buttons) {
+                button.setAlpha(1f);
+            }
         }
         invalidate();
         return true;
@@ -92,9 +115,15 @@ public class DrawingCanvasView extends View {
 
 
     /* Set attributes for paint */
-    public void SetPaint()
+    public void SetPaint(int color)
     {
+        drawPaint.setColor(color);
+    }
 
+    /* Gets the current paint color */
+    public int GetPaintColor()
+    {
+        return drawPaint.getColor();
     }
 
     /* Clears the canvas */

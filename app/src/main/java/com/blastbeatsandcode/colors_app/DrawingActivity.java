@@ -7,11 +7,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.app.Activity;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -20,11 +22,14 @@ import com.blastbeatsandcode.colors_app.R;
 
 import java.util.Calendar;
 
+import top.defaults.colorpicker.ColorPickerPopup;
+
 public class DrawingActivity extends Activity {
 
     private Button _btnSave;
     private Button _btnClear;
     private Button _btnSwitchToTextEntry;
+    private Button _btnColorPicker;
     private DrawingCanvasView _drawingView;
 
     @Override
@@ -37,6 +42,13 @@ public class DrawingActivity extends Activity {
         _btnClear = findViewById(R.id.btn_clear);
         _btnSwitchToTextEntry = findViewById(R.id.btn_switch_to_user_entry);
         _drawingView = findViewById(R.id.drawing_area);
+        _btnColorPicker = findViewById(R.id.btn_color_picker);
+
+        // Send buttons to the drawingView
+        _drawingView.AddButton(_btnClear);
+        _drawingView.AddButton(_btnSave);
+        _drawingView.AddButton(_btnColorPicker);
+        _drawingView.AddButton(_btnSwitchToTextEntry);
 
         // Map buttons to functions
         _btnSwitchToTextEntry.setOnClickListener(new View.OnClickListener() {
@@ -57,6 +69,13 @@ public class DrawingActivity extends Activity {
             @Override
             public void onClick(View v) {
                 SaveCanvas();
+            }
+        });
+
+        _btnColorPicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ColorPick(v);
             }
         });
     }
@@ -131,4 +150,28 @@ public class DrawingActivity extends Activity {
         startActivity(intent);
     }
 
+    /* Open color picker */
+    private void ColorPick(View v)
+    {
+        new ColorPickerPopup.Builder(this)
+            .initialColor(_drawingView.GetPaintColor()) // Set initial color
+            .enableAlpha(true) // Enable alpha slider or not
+            .okTitle("Choose")
+            .cancelTitle("Cancel")
+            .showIndicator(true)
+            .showValue(true)
+            .build()
+            .show(v, new ColorPickerPopup.ColorPickerObserver() {
+                @Override
+                public void onColorPicked(int color) {
+                    _drawingView.SetPaint(color);
+                    _btnColorPicker.setBackgroundColor(color);
+                }
+
+                @Override
+                public void onColor(int color, boolean fromUser) {
+
+                }
+            });
+    }
 }
