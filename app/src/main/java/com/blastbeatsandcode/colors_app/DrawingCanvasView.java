@@ -1,31 +1,19 @@
 package com.blastbeatsandcode.colors_app;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.ContextWrapper;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /* Custom view for drawing on screen */
 public class DrawingCanvasView extends View {
@@ -93,24 +81,34 @@ public class DrawingCanvasView extends View {
 
         if(event.getAction() == MotionEvent.ACTION_DOWN){
             drawPath.moveTo(x, y);
-
-            // Make buttons transparent while drawing
-            for (Button button: buttons) {
-                button.setAlpha(0.25f);
-            }
+            TransparentButtons(); // Make buttons transparent
         }else if(event.getAction() == MotionEvent.ACTION_MOVE){
             drawPath.lineTo(x, y);
         }else if(event.getAction() == MotionEvent.ACTION_UP){
             drawCanvas.drawPath(drawPath, drawPaint);
             drawPath.reset();
-
-            // When user is done drawing, return buttons to full alpha state
-            for (Button button: buttons) {
-                button.setAlpha(1f);
-            }
+            OpaqueButtons(); // Make buttons opaque again
         }
         invalidate();
         return true;
+    }
+
+    private void OpaqueButtons() {
+        // When user is done drawing, return buttons to full alpha state
+        if (!buttons.isEmpty()) {
+            for (Button button : buttons) {
+                button.setAlpha(1f);
+            }
+        }
+    }
+
+    private void TransparentButtons() {
+        // Make buttons transparent while drawing
+        if (!buttons.isEmpty()) {
+            for (Button button : buttons) {
+                button.setAlpha(0.25f);
+            }
+        }
     }
 
 
