@@ -6,11 +6,17 @@ This application is my take on the first required homework for CEG 4110 at WSU. 
 ## MainActivity (Text Entry with Random Colors)
 <img src="images/scrn_01.png" align="left">
 
-`MainActivity` is the initial activity of this application. The user can enter a string of text at the top of the screen and select the "Change Color" button which will set the text to a random color while also displaying the RGB and Hex value of that color.
+`MainActivity` is the initial activity of this application.
+
+The user can enter a string of text at the top of the screen and select the "Change Color" button which will set the text to a random color while also displaying the RGB and Hex value of that color.
 
 The random color is set by calling `GetRandomSingleRGBValue()` three times and assigning the returned values to R, G, and B respectively. In this way, we can also send these values to the labels which will report the numerical and hexidecimal values of the random color.
 
+The label values are set by calling the `SetColorStrings()` method whenever a new color is generated. This method handles creating these labels by taking in the integer values of the RGB color and setting the text of the `_rgbText` and the `_hexText` member variables to the equivalent values.
+
 The hexidecimal values are obtained by taking each individual integer given for the RGB values and calling `Integer.toHexString()` which, when combined together gives us the complete hexidecimal representation for the new random color.
+
+This activity uses all default android widgets and elements so it can be built without using our soon-to-be-defined custom view. Splitting these funcitons up into the bite-sized snippets they are makes the activity code behind much easier to read.
 
 
 ## DrawingActivity (User Drawing on Screen)
