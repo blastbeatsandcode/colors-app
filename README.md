@@ -16,8 +16,6 @@ The label values are set by calling the `SetColorStrings()` method whenever a ne
 
 The hexidecimal values are obtained by taking each individual integer given for the RGB values and calling `Integer.toHexString()` which, when combined together gives us the complete hexidecimal representation for the new random color.
 
-This activity uses all default android widgets and elements so it can be built without using our soon-to-be-defined custom view. Splitting these funcitons up into the bite-sized snippets they are makes the activity code behind much easier to read.
-
 
 ## DrawingActivity (User Drawing on Screen)
 <img src="images/scrn_03.png" align="right">
@@ -53,7 +51,7 @@ As the user draws paths onto the screen, the `onTouchEvent()` keeps track of the
 
 **Don't forget save your masterpiece to your device!**
 <div align="center">
-    <img src="images/scrn-04.png">
+    <img src="images/scrn_04.png">
 </div>
 
 ### Dependencies
