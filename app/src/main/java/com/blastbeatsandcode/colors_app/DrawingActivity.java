@@ -24,14 +24,22 @@ import java.util.Calendar;
 
 import top.defaults.colorpicker.ColorPickerPopup;
 
+/*
+*   Allows the user to draw on the screen.
+*   Allows the saving of the image, clearing of the drawn image,
+*   or selecting colors to draw with.
+* */
 public class DrawingActivity extends Activity {
-
+    // Member variables, includes buttons and the custom drawing view
     private Button _btnSave;
     private Button _btnClear;
     private Button _btnSwitchToTextEntry;
     private Button _btnColorPicker;
     private DrawingCanvasView _drawingView;
 
+    /*
+    *   Creates the activity and maps buttons to functions.
+    * */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,13 +52,14 @@ public class DrawingActivity extends Activity {
         _drawingView = findViewById(R.id.drawing_area);
         _btnColorPicker = findViewById(R.id.btn_color_picker);
 
-        // Send buttons to the drawingView
+        // Send buttons to the drawingView so they can be transparent when user is drawing
         _drawingView.AddButton(_btnClear);
         _drawingView.AddButton(_btnSave);
         _drawingView.AddButton(_btnColorPicker);
         _drawingView.AddButton(_btnSwitchToTextEntry);
 
         // Map buttons to functions
+        // Switch to text entry activity
         _btnSwitchToTextEntry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,6 +67,7 @@ public class DrawingActivity extends Activity {
             }
         });
 
+        // Clear the canvas
         _btnClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,6 +75,7 @@ public class DrawingActivity extends Activity {
             }
         });
 
+        // Save the canvas as an image
         _btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,6 +83,7 @@ public class DrawingActivity extends Activity {
             }
         });
 
+        // Open color picker
         _btnColorPicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,9 +92,12 @@ public class DrawingActivity extends Activity {
         });
     }
 
-    /* Save the user created image */
+    /*
+    *   Save the user created image.
+    * */
     public void SaveCanvas()
     {
+        // First check to see if the app has permission to save the image
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             // Permission is not granted, ask for permission
@@ -90,87 +105,110 @@ public class DrawingActivity extends Activity {
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
 
         }
-            AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
-            saveDialog.setTitle("Save Drawing");
-            saveDialog.setMessage("Save drawing to device?");
-            saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
 
-                public void onClick(DialogInterface dialog, int which){
-                    // Generate a random file name and save the image as a PNG
-                    String fileName = String.valueOf(Calendar.getInstance().getTimeInMillis());
-                    Bitmap bmp = loadBitmapFromView(_drawingView);
+        // Show dialog to ask user to save image
+        AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
+        saveDialog.setTitle("Save Drawing");
+        saveDialog.setMessage("Save drawing to gallery?");
 
-                    // Here we save the image to the gallery
-                    String saved = MediaStore.Images.Media.insertImage(getContentResolver(), bmp, fileName + ".png", "Drawing");
+        // If user selects "Yes"
+        saveDialog.setPositiveButton("Save", new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int which){
+                // Generate a random file name based on current milliseconds and save the image as a PNG
+                String fileName = String.valueOf(Calendar.getInstance().getTimeInMillis());
+                Bitmap bmp = loadBitmapFromView(_drawingView);
 
-                    // Show toast to show if image has been saved or not
-                    if (saved != "")
-                        Toast.makeText(getBaseContext(), "Image saved to Gallery", Toast.LENGTH_LONG).show();
-                    else
-                        Toast.makeText(getBaseContext(), "Image could not be saved.", Toast.LENGTH_LONG).show();
-                }
-            });
+                // Here we save the image to the gallery
+                String saved = MediaStore.Images.Media.insertImage(getContentResolver(), bmp, fileName + ".png", "Drawing");
+
+                // Show toast to show if image has been saved or not
+                if (saved != "")
+                    Toast.makeText(getBaseContext(), "Image saved to Gallery", Toast.LENGTH_LONG).show();
+                else
+                    Toast.makeText(getBaseContext(), "Image could not be saved.", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // If user selects "Cancel"
         saveDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
             public void onClick(DialogInterface dialog, int which){
                 dialog.cancel();
             }
         });
+
+        // Show the save dialog
         saveDialog.show();
     }
 
+    /*
+    *   Takes in a view and creates a bitmap from its appearance.
+    *   This is used to create an image of the user's drawing.
+    *   Method is a modified version of code by Laura SuciuSnippets:
+    *   https://www.myandroidsolutions.com/2013/02/10/android-get-view-drawimage-and-save-it/#.W5WwdRgpBhE
+    * */
     public static Bitmap loadBitmapFromView(View view) {
 
-        // width measure spec
-        int widthSpec = View.MeasureSpec.makeMeasureSpec(
+        // Get height and width of the view
+        int w = View.MeasureSpec.makeMeasureSpec(
                 view.getMeasuredWidth(), View.MeasureSpec.AT_MOST);
-        // height measure spec
-        int heightSpec = View.MeasureSpec.makeMeasureSpec(
+        int h = View.MeasureSpec.makeMeasureSpec(
                 view.getMeasuredHeight(), View.MeasureSpec.AT_MOST);
-        // measure the view
-        view.measure(widthSpec, heightSpec);
-        // set the layout sizes
-        view.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth() + view.getLeft(), view.getMeasuredHeight() + view.getTop());
-        // create the bitmap
-        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
-        // create a canvas used to get the view's image and draw it on the bitmap
-        Canvas c = new Canvas(bitmap);
-        // position the image inside the canvas
-        c.translate(-view.getScrollX(), -view.getScrollY());
-        // get the canvas
-        view.draw(c);
 
+        // Set measurement constraints
+        view.measure(w, h);
+        view.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth() + view.getLeft(),
+                view.getMeasuredHeight() + view.getTop());
+
+        // Create a bitmap based on the view; this is the image we will save
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+
+        // Create a canvas and draw the bitmap onto it
+        Canvas canvas = new Canvas(bitmap);
+
+        // Position the bitmap inside of the canvas
+        canvas.translate(-view.getScrollX(), -view.getScrollY());
+
+        // Draw onto the canvas
+        view.draw(canvas);
+
+        // Return the created image
         return bitmap;
     }
 
 
-    /* Switch back to the user entry activity */
+    /*
+    *   Switches back to the user entry activity
+    * */
     private void StartUserEntryActivity()
     {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
-    /* Open color picker */
+    /*
+    *   Opens the color picker window.
+    *   When the user Selects a color, it sets the paint in the drawing view to that color
+    *   and updates the background of the color picker button to the newly selected color.
+    * */
     private void ColorPick(View v)
     {
         new ColorPickerPopup.Builder(this)
-            .initialColor(_drawingView.GetPaintColor()) // Set initial color
-            .enableAlpha(true) // Enable alpha slider or not
-            .okTitle("Choose")
-            .cancelTitle("Cancel")
+            .initialColor(_drawingView.GetPaintColor()) // Set initial color to the default paint color
+            .enableAlpha(true)                          // Enable alpha slider
+            .okTitle("Choose")                          // Set title for the OK button
+            .cancelTitle("Cancel")                      // Set title for the CANCEL button
             .showIndicator(true)
             .showValue(true)
             .build()
             .show(v, new ColorPickerPopup.ColorPickerObserver() {
                 @Override
                 public void onColorPicked(int color) {
-                    _drawingView.SetPaint(color);
-                    _btnColorPicker.setBackgroundColor(color);
+                    _drawingView.SetPaint(color);               // Set paint color
+                    _btnColorPicker.setBackgroundColor(color);  // Set button color
                 }
-
                 @Override
                 public void onColor(int color, boolean fromUser) {
-
+                    // Do nothing
                 }
             });
     }
