@@ -7,18 +7,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.app.Activity;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
-import com.blastbeatsandcode.colors_app.R;
 
 import java.util.Calendar;
 
@@ -116,7 +112,7 @@ public class DrawingActivity extends Activity {
             public void onClick(DialogInterface dialog, int which){
                 // Generate a random file name based on current milliseconds and save the image as a PNG
                 String fileName = String.valueOf(Calendar.getInstance().getTimeInMillis());
-                Bitmap bmp = loadBitmapFromView(_drawingView);
+                Bitmap bmp = LoadBitmapFromView(_drawingView);
 
                 // Here we save the image to the gallery
                 String saved = MediaStore.Images.Media.insertImage(getContentResolver(), bmp, fileName + ".png", "Drawing");
@@ -146,7 +142,7 @@ public class DrawingActivity extends Activity {
     *   Method is a modified version of code by Laura SuciuSnippets:
     *   https://www.myandroidsolutions.com/2013/02/10/android-get-view-drawimage-and-save-it/#.W5WwdRgpBhE
     * */
-    public static Bitmap loadBitmapFromView(View view) {
+    public static Bitmap LoadBitmapFromView(View view) {
 
         // Get height and width of the view
         int w = View.MeasureSpec.makeMeasureSpec(
