@@ -60,8 +60,8 @@ There is one main [external dependency](https://github.com/duanhong169/ColorPick
 ```
 dependencies {
     ...
-impleme which returns:1.1.2'
-    ... which returns
+implementation 'com.github.duanhong169:colorpicker:1.1.2'
+    ... 
 }
 ```
 
